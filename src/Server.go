@@ -27,6 +27,8 @@ func (wl *wlb)Init() error{
         return err
     }
     wl.Db.AutoMigrate(&dbMessage{})
+    wl.Db.AutoMigrate(&whperson{})
+    wl.Db.AutoMigrate(&whoperator{})
     return err
 }
 
@@ -37,9 +39,10 @@ func (wl *wlb)OnWebhookPost(w http.ResponseWriter, r *http.Request) {
         fmt.Printf("The input message can't be parsed, Syntax Error ? ")
     }
     go wl.UpdateDb(whm)
-    
 }
 
 func (wl *wlb)UpdateDb(whm webHookMessage) {
-    return
+    for _, commit:= range whm.Commits {
+        wl.Db.Create(&dbMessage{Commit: commit, Repository: whm.Repository})
+    }
 }

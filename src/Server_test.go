@@ -15,7 +15,7 @@ func TestCreateDb(t *testing.T) {
         t.Fail()
     }
     t.Log("Db init success")
-    content, err := os.ReadFile("./test/example.json")
+    content, err := os.ReadFile("./test/example_2.json")
     var aMsg dbMessage
     rst, _ := WebHookParse(content)
     aMsg.Commit = rst.Commits[0]
@@ -23,4 +23,8 @@ func TestCreateDb(t *testing.T) {
     w.Db.Create(&aMsg)
     w.Db.First(&aMsg, 1)
     fmt.Printf("%v\n", aMsg)
+
+    w.UpdateDb(rst)
+
+
 }
