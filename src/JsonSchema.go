@@ -1,47 +1,74 @@
 package wlbsrv
 // wh prefix means Webhook
+import (
+    "encoding/json"
+    "time"
+    "gorm.io/gorm"
+)
+
 type whcommits struct{
-    Id string
+    ID uint `gorm:"PrimaryKey;autoIncrement" json:"Ignore"`
+    CreatedAt time.Time
+    UpdatedAt time.Time
+    DeletedAt gorm.DeletedAt `gorm:"Index"`
+    CommitId string `json:"id"`
     Message string
     Url string
-    Author whperson
-    Committer whperson
+    Author whperson `gorm:"foreignKey:ID"`
+    Committer whperson `gorm:"foreignKey:ID"`
     timestamp string
 }
 
 type whperson struct{
+    gorm.Model
     Name string
     Email string
     Username string
 }
 
 type whrepository struct{
-    Id int
-    Owner whoperator 
-    Name string
+    ID uint `gorm:"PrimaryKey" json:"Ignore"`
+    CreatedAt time.Time
+    UpdatedAt time.Time
+    DeletedAt gorm.DeletedAt `gorm:"Index"`
+    RepoId int `json:"id"`
+    Owner whoperator `gorm:"foreignKey:ID"`
+    Name string `gorm:"Index"`
     Private bool
     Fork bool
     Website string
-    CreatedAt string "created_at"
-    UpdatedAt string "updated_at"
+    RepoCreatedAt string `json:"created_at"`
+    RepoUpdatedAt string `json:"updated_at"`
 }
 
 type whoperator struct {
-    Id int
+    ID uint `gorm:"PrimaryKey" json:"Ignore"`
+    CreatedAt time.Time
+    UpdatedAt time.Time
+    DeletedAt gorm.DeletedAt `gorm:"Index"`
+    UserId int `json:"id"`
     Login string
-    FullName string "full_name"
+    FullName string 
     Email  string
-    Avatar string "avatar_url" // In fact we don't really care about this
+    Avatar string  // In fact we don't really care about this
     Username string
 }
 
-type WebHookMessage struct {
+type webHookMessage struct {
+    gorm.Model
     Ref string
     Before string
     After string
-    CompareUrl string "compare_url"
-    Commits []whcommits
-    Repository whrepository
-    Pusher whoperator
-    Sender whoperator
+    CompareUrl string 
+    Commits []whcommits `gorm:"foreignKey:Name"`
+    Repository whrepository `gorm:"foreignKey:ID"`
+    Pusher whoperator `gorm:"foreignKey:ID"`
+    Sender whoperator `gorm:"foreignKey:ID"`
+
+}
+
+func WebHookParse(text []byte)(webHookMessage, error) {
+    var whm webHookMessage
+    err := json.Unmarshal(text, &whm)
+    return whm, err
 }
