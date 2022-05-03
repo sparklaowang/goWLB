@@ -7,7 +7,7 @@ import (
 )
 
 func TestCreateDb(t *testing.T) {
-    w := wlb{}
+    w := Wlb{}
     w.DbName="test.db"
     err := w.Init()
     if err != nil {
@@ -21,10 +21,10 @@ func TestCreateDb(t *testing.T) {
     aMsg.Commit = rst.Commits[0]
     aMsg.Repository = rst.Repository
     w.Db.Create(&aMsg)
-    w.Db.First(&aMsg, 1)
-    fmt.Printf("%v\n", aMsg)
+    fmt.Printf("%v\n", aMsg.Commit.ID)
+    fmt.Printf("%v\n", aMsg.Commit.Timestamp)
 
     w.UpdateDb(rst)
 
-
+    t.Log("Finished")
 }

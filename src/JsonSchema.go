@@ -16,7 +16,7 @@ type whcommits struct{
     Url string
     Author whperson `gorm:"foreignKey:ID"`
     Committer whperson `gorm:"foreignKey:ID"`
-    timestamp string
+    Timestamp time.Time
 }
 
 type whperson struct{
