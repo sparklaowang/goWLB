@@ -16,8 +16,9 @@ type Wlb struct {
 
 type dbMessage struct{
     gorm.Model
-    Commit whcommits `gorm:"embedded"`
-    Repository whrepository `gorm:"foreignKey:ID"`
+    Commit whcommits `gorm:"embedded;embeddedPrefix:commit"`
+    RepositoryID int
+    Repository whrepository `gorm:"references:RepoId"`
 }
 
 func (wl *Wlb)Init() error{
@@ -45,7 +46,13 @@ func (wl *Wlb)OnWebhookPost(w http.ResponseWriter, r *http.Request) {
 
 func (wl *Wlb)UpdateDb(whm webHookMessage) {
     for _, commit:= range whm.Commits {
-        wl.Db.Create(&dbMessage{Commit: commit, Repository: whm.Repository})
+        fmt.Printf("%s|%sCmt %s to rep%d\n", 
+        commit.Author.Name, 
+        commit.Committer.Name,
+        commit.CommitId, whm.Repository.RepoId)
+        wl.Db.Create(&dbMessage{
+            Commit: commit,
+            Repository: whm.Repository})
     }
 }
 // A very basic start that use net/http as server framework
