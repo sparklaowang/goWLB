@@ -7,32 +7,29 @@ import (
 )
 
 type whcommits struct{
-    ID uint `gorm:"PrimaryKey;autoIncrement" json:"Ignore"`
-    CreatedAt time.Time
-    UpdatedAt time.Time
-    DeletedAt gorm.DeletedAt `gorm:"Index"`
     CommitId string `json:"id"`
     Message string
     Url string
-    Author whperson `gorm:"foreignKey:ID"`
-    Committer whperson `gorm:"foreignKey:ID"`
+    AuthorID string
+    Author whperson `gorm:"references:Name"`
+    CommitterID string
+    Committer whperson  `gorm:"references:Name"`
     Timestamp time.Time
 }
 
 type whperson struct{
-    gorm.Model
-    Name string
+    gorm.Model 
+    Name string  `json:"name" gorm:"unique"`
     Email string
     Username string
 }
 
 type whrepository struct{
     ID uint `gorm:"PrimaryKey" json:"Ignore"`
-    CreatedAt time.Time
-    UpdatedAt time.Time
-    DeletedAt gorm.DeletedAt `gorm:"Index"`
-    RepoId int `json:"id"`
-    Owner whoperator `gorm:"foreignKey:ID"`
+    RepoId int `json:"id" gorm:"unique;index"`
+
+    OwnerID int
+    Owner whoperator `gorm:"references:UserId"`
     Name string `gorm:"Index"`
     Private bool
     Fork bool
@@ -43,10 +40,7 @@ type whrepository struct{
 
 type whoperator struct {
     ID uint `gorm:"PrimaryKey" json:"Ignore"`
-    CreatedAt time.Time
-    UpdatedAt time.Time
-    DeletedAt gorm.DeletedAt `gorm:"Index"`
-    UserId int `json:"id"`
+    UserId int `json:"id" gorm:"unique"`
     Login string
     FullName string 
     Email  string
@@ -60,10 +54,13 @@ type webHookMessage struct {
     Before string
     After string
     CompareUrl string 
-    Commits []whcommits `gorm:"foreignKey:Name"`
-    Repository whrepository `gorm:"foreignKey:ID"`
-    Pusher whoperator `gorm:"foreignKey:ID"`
-    Sender whoperator `gorm:"foreignKey:ID"`
+    Commits []whcommits 
+    RepositoryID int
+    Repository whrepository `gorm:"references:RepoId"`
+    PusherID int
+    Pusher whoperator 
+    SenderID int
+    Sender whoperator 
 
 }
 
